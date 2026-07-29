@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>10 种美学风格 · 网站设计语言图谱</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Space+Grotesk:wght@300;400;500;700&family=Space+Mono:wght@400;700&family=Archivo+Black&family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet" />
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;overflow:hidden;background:#0c0c0e;}
+  body{font-family:"Space Grotesk",system-ui,sans-serif;color:#f4f4f4;-webkit-font-smoothing:antialiased;}
+
+  /* ===== HUD ===== */
+  .hud{position:fixed;top:0;left:0;right:0;height:54px;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:0 22px;background:rgba(12,12,14,.82);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.08);}
+  .hud .left{display:flex;align-items:baseline;gap:14px;min-width:0;}
+  .hud .idx{font-family:"Space Mono",monospace;font-size:13px;color:#9aa0a6;letter-spacing:.05em;}
+  .hud .nm{font-size:15px;font-weight:500;letter-spacing:.02em;white-space:nowrap;}
+  .hud .kw{font-family:"Space Mono",monospace;font-size:11px;color:#6b7177;letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .hud .right{display:flex;align-items:center;gap:16px;flex:0 0 auto;}
+  .hud .hint{font-family:"Space Mono",monospace;font-size:11px;color:#6b7177;}
+  .hud .ibtn{cursor:pointer;font-family:"Space Mono",monospace;font-size:12px;color:#f4f4f4;border:1px solid rgba(255,255,255,.25);padding:5px 11px;border-radius:4px;background:transparent;transition:.2s;}
+  .hud .ibtn:hover{background:rgba(255,255,255,.1);}
+
+  /* ===== DECK ===== */
+  .track{display:flex;height:100vh;transition:transform .65s cubic-bezier(.7,0,.2,1);will-change:transform;}
+  .slide{width:100vw;height:100vh;flex:0 0 100vw;overflow:hidden;position:relative;opacity:.35;transition:opacity .55s ease;}
+  .slide.active{opacity:1;}
+
+  /* ===== INDEX OVERLAY ===== */
+  .index{position:fixed;inset:0;z-index:80;background:rgba(8,8,10,.97);display:none;grid-template-columns:repeat(4,1fr);grid-auto-rows:min-content;gap:14px;padding:80px 40px 40px;overflow:auto;}
+  .index.open{display:grid;}
+  .index .cell{cursor:pointer;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:18px;transition:.2s;background:rgba(255,255,255,.02);}
+  .index .cell:hover{border-color:#fff;transform:translateY(-3px);}
+  .index .cell .n{font-family:"Space Mono",monospace;font-size:12px;color:#7a8086;}
+  .index .cell .t{font-size:17px;font-weight:600;margin:6px 0 4px;}
+  .index .cell .k{font-family:"Space Mono",monospace;font-size:10.5px;color:#6b7177;line-height:1.5;}
+
+  /* ===== SHARED MOCKUP STRUCTURE (themeable via CSS vars) ===== */
+  .mock{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);color:var(--fg);font-family:var(--font-body);overflow:hidden;}
+  .mock-nav{display:flex;align-items:center;justify-content:space-between;padding:var(--pad);border-bottom:var(--hairline);flex:0 0 auto;}
+  .brand{font-family:var(--font-display);font-size:var(--brand-size,2.4vw);font-weight:var(--brand-weight,700);letter-spacing:var(--brand-spacing,.04em);}
+  .nav-links{display:flex;gap:var(--nav-gap,2.4vw);font-family:var(--font-body);font-size:var(--nav-size,.95vw);letter-spacing:var(--nav-spacing,0);opacity:.85;}
+  .mock-body{flex:1 1 auto;overflow:auto;padding:var(--pad);display:flex;flex-direction:column;gap:var(--section-gap,4vh);}
+  .kicker{font-family:var(--font-mono,monospace);font-size:var(--kicker-size,.9vw);letter-spacing:var(--kicker-spacing,.28em);text-transform:uppercase;color:var(--accent);opacity:.9;}
+  .h1{font-family:var(--font-display);font-size:var(--h1-size,6vw);font-weight:var(--h1-weight,700);line-height:var(--h1-lh,1.02);letter-spacing:var(--h1-spacing,-.01em);max-width:var(--h1-width,80%);}
+  .lead{font-size:var(--lead-size,1.25vw);line-height:var(--lead-lh,1.7);max-width:var(--lead-width,46%);opacity:.82;}
+  .cta{display:inline-flex;align-items:center;gap:.5em;align-self:flex-start;margin-top:1.2vh;background:var(--btn-bg);color:var(--btn-fg);border:var(--btn-border,none);padding:var(--btn-pad,1.1vh 2.2vw);border-radius:var(--btn-radius,0);font-family:var(--font-body);font-size:var(--btn-size,1vw);letter-spacing:var(--btn-spacing,0);cursor:pointer;text-decoration:none;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:var(--col-gap,3vw);align-items:start;}
+  .about-p{font-size:var(--body-size,1.05vw);line-height:1.8;opacity:.8;}
+  .stats{display:flex;gap:3vw;}
+  .stat .num{font-family:var(--font-display);font-size:var(--stat-size,3vw);font-weight:var(--h1-weight,700);color:var(--accent);}
+  .stat .lab{font-family:var(--font-mono,monospace);font-size:.8vw;letter-spacing:.1em;opacity:.6;text-transform:uppercase;}
+  .works{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--work-gap,1.6vw);}
+  .work-card{border:var(--card-border,none);border-radius:var(--card-radius,0);background:var(--card-bg,transparent);padding:var(--card-pad,1.6vw);min-height:var(--card-h,18vh);display:flex;flex-direction:column;justify-content:space-between;box-shadow:var(--card-shadow,none);}
+  .work-card .wt{font-family:var(--font-display);font-size:var(--work-title,1.5vw);font-weight:var(--work-weight,700);}
+  .work-card .wd{font-size:.95vw;opacity:.7;line-height:1.6;margin-top:.6vh;}
+  .work-card .wk{font-family:var(--font-mono,monospace);font-size:.72vw;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);}
+  .mock-foot{border-top:var(--hairline);padding:var(--pad);display:flex;justify-content:space-between;font-family:var(--font-mono,monospace);font-size:.82vw;letter-spacing:.06em;opacity:.6;flex:0 0 auto;}
+
+  /* ===================================================== */
+  /* 0 · COVER                                            */
+  /* ===================================================== */
+  .s-cover{--bg:#0c0c0e;--fg:#f4f4f4;}
+  .s-cover .mock{align-items:center;justify-content:center;text-align:center;gap:2vh;}
+  .s-cover .ct{font-family:"Space Mono",monospace;font-size:13px;letter-spacing:.4em;color:#8a9096;}
+  .s-cover .ch{font-family:"Playfair Display","Noto Serif SC",serif;font-size:6.4vw;font-weight:900;line-height:1.05;}
+  .s-cover .cl{font-size:1.3vw;opacity:.7;max-width:42%;line-height:1.7;}
+  .s-cover .cgrid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:64%;margin-top:1vh;}
+  .s-cover .chip{font-family:"Space Mono",monospace;font-size:11px;border:1px solid rgba(255,255,255,.2);padding:6px 12px;border-radius:20px;color:#cfd3d7;}
+  .s-cover .cnav{font-family:"Space Mono",monospace;font-size:12px;color:#7a8086;margin-top:2vh;}
+
+  /* ===================================================== */
+  /* 1 · 极简主义 MINIMALISM                              */
+  /* ===================================================== */
+  .s-minimal{
+    --bg:#ffffff;--fg:#111111;--accent:#111;
+    --hairline:1px solid #ededed;
+    --font-display:"Space Grotesk",system-ui;--font-body:system-ui;--font-mono:"Space Mono",monospace;
+    --pad:3.2vw 4vw;--section-gap:5vh;
+    --brand-size:2.2vw;--brand-weight:500;--nav-size:.92vw;--nav-gap:3vw;
+    --kicker-size:.85vw;--kicker-spacing:.3em;
+    --h1-size:8.2vw;--h1-weight:200;--h1-lh:1.0;--h1-width:74%;
+    --lead-size:1.15vw;--lead-width:40%;--lead-lh:1.75;
+    --btn-bg:#111;--btn-fg:#fff;--btn-pad:1.3vh 2.4vw;--btn-size:.95vw;
+    --body-size:1vw;--stat-size:3.4vw;--col-gap:5vw;
+    --work-gap:1.4vw;--card-pad:1.4vw;--card-h:16vh;--work-title:1.4vw;
+  }
+  .s-minimal .h1{letter-spacing:-.03em;}
+
+  /* ===================================================== */
+  /* 2 · 繁复混乱 MAXIMALIST CHAOS                         */
+  /* ===================================================== */
+  .s-chaos{
+    --bg:#f4f0e6;--fg:#16130c;--accent:#e23b2e;
+    --hairline:3px solid #16130c;
+    --font-display:"Playfair Display","Noto Serif SC",serif;--font-body:"Space Grotesk",system-ui;--font-mono:"Space Mono",monospace;
+    --pad:2.4vw 3vw;--section-gap:3vh;
+    --brand-size:2.6vw;--brand-weight:900;--nav-size:1vw;--nav-gap:2vw;
+    --kicker-size:1vw;--kicker-spacing:.2em;
+    --h1-size:6.6vw;--h1-weight:900;--h1-lh:1.0;--h1-width:60%;
+    --lead-size:1.2vw;--lead-width:46%;--lead-lh:1.6;
+    --btn-bg:#16130c;--btn-fg:#f4f0e6;--btn-pad:1.2vh 2vw;--btn-size:1vw;
+    --body-size:1.02vw;--stat-size:3vw;--col-gap:2.4vw;
+    --work-gap:1.6vw;--card-pad:1.4vw;--card-h:20vh;--work-title:1.5vw;--work-weight:900;
+  }
+  .s-chaos .kicker{background:#ffd23f;color:#16130c;display:inline-block;padding:.4vh .9vw;transform:rotate(-2deg);font-weight:700;}
+  .s-chaos .h1{text-shadow:4px 4px 0 #4aa3c7;transform:rotate(-1deg);}
+  .s-chaos .lead{background:#fff;padding:1.4vh 1.4vw;border:2px solid #16130c;box-shadow:6px 6px 0 #c1684a;}
+  .s-chaos .work-card:nth-child(1){background:#ffd23f;transform:rotate(-2deg);border:2px solid #16130c;}
+  .s-chaos .work-card:nth-child(2){background:#4aa3c7;transform:rotate(1.5deg);border:2px solid #16130c;color:#06121a;}
+  .s-chaos .work-card:nth-child(3){background:#9fd356;transform:rotate(-1deg);border:2px solid #16130c;color:#0c1a06;}
+  .s-chaos .cta{box-shadow:5px 5px 0 #e23b2e;transform:rotate(1deg);}
+  .s-chaos .nav-links{font-weight:700;}
+
+  /* ===================================================== */
+  /* 3 · 复古未来 RETRO-FUTURISM                          */
+  /* ===================================================== */
+  .s-retro{
+    --bg:#0a0a16;--fg:#e8e8ff;--accent:#00f0ff;
+    --hairline:1px solid rgba(0,240,255,.3);
+    --font-display:"Space Grotesk",system-ui;--font-body:"Space Grotesk",system-ui;--font-mono:"Space Mono",monospace;
+    --pad:2.8vw 3.4vw;--section-gap:4vh;
+    --brand-size:2.2vw;--brand-weight:700;--nav-size:.9vw;--nav-gap:2.6vw;
+    --kicker-size:.85vw;--kicker-spacing:.32em;
+    --h1-size:6.4vw;--h1-weight:700;--h1-lh:1.05;--h1-width:78%;
+    --lead-size:1.1vw;--lead-width:44%;--lead-lh:1.7;
+    --btn-bg:transparent;--btn-fg:#00f0ff;--btn-border:1px solid #00f0ff;--btn-pad:1.1vh 2.2vw;--btn-size:.95vw;--btn-spacing:.1em;
+    --body-size:1vw;--stat-size:3.2vw;--col-gap:3.5vw;
+    --work-gap:1.6vw;--card-pad:1.5vw;--card-h:18vh;--work-title:1.45vw;--card-border:1px solid rgba(255,46,154,.5);
+  }
+  .s-retro .brand{color:#ff2e9a;text-shadow:0 0 12px rgba(255,46,154,.7);}
+  .s-retro .h1{color:#fff;text-shadow:0 0 18px rgba(0,240,255,.55),3px 3px 0 #ff2e9a;}
+  .s-retro .kicker{color:#ffd23f;}
+  .s-retro .cta{box-shadow:0 0 14px rgba(0,240,255,.5);}
+  .s-retro .work-card:nth-child(1){background:rgba(0,240,255,.06);}
+  .s-retro .work-card:nth-child(2){background:rgba(255,46,154,.06);}
+  .s-retro .work-card:nth-child(3){background:rgba(255,210,63,.06);}
+  .s-retro .mock::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,0) 0px,rgba(0,0,0,0) 2px,rgba(0,0,0,.18) 3px,rgba(0,0,0,0) 4px);mix-blend-mode:overlay;}
+  .s-retro .deco-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,240,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(0,240,255,.07) 1px,transparent 1px);background-size:46px 46px;pointer-events:none;}
+  .s-retro .shape{position:absolute;border:1px solid rgba(255,46,154,.5);}
+  .s-retro .s1{width:160px;height:160px;border-radius:50%;top:12vh;right:6vw;box-shadow:0 0 30px rgba(255,46,154,.35);}
+  .s-retro .s2{width:90px;height:90px;bottom:14vh;right:18vw;transform:rotate(45deg);border-color:rgba(0,240,255,.5);box-shadow:0 0 24px rgba(0,240,255,.3);}
+
+  /* ===================================================== */
+  /* 4 · 有机自然 ORGANIC NATURAL                         */
+  /* ===================================================== */
+  .s-organic{
+    --bg:#f3ede1;--fg:#3a3027;--accent:#c1684a;
+    --hairline:1px solid rgba(58,48,39,.18);
+    --font-display:"Space Grotesk",system-ui;--font-body:"Space Grotesk",system-ui;--font-mono:"Space Mono",monospace;
+    --pad:3vw 3.6vw;--section-gap:4.5vh;
+    --brand-size:2.2vw;--brand-weight:500;--nav-size:.95vw;--nav-gap:2.8vw;
+    --kicker-size:.9vw;--kicker-spacing:.18em;
+    --h1-size:6vw;--h1-weight:400;--h1-lh:1.12;--h1-width:66%;
+    --lead-size:1.2vw;--lead-width:46%;--lead-lh:1.75;
+    --btn-bg:#7c7a3e;--btn-fg:#f3ede1;--btn-pad:1.3vh 2.4vw;--btn-radius:40px;--btn-size:1vw;
+    --body-size:1.05vw;--stat-size:3.2vw;--col-gap:3.5vw;
+    --work-gap:1.8vw;--card-pad:1.7vw;--card-h:18vh;--work-title:1.5vw;--card-radius:26px;--card-bg:rgba(156,175,136,.22);
+  }
+  .s-organic .brand{color:#7c7a3e;}
+  .s-organic .work-card:nth-child(1){background:rgba(193,104,74,.16);}
+  .s-organic .work-card:nth-child(2){background:rgba(124,122,62,.18);}
+  .s-organic .work-card:nth-child(3){background:rgba(156,175,136,.26);}
+  .s-organic .squiggle{position:absolute;left:4vw;bottom:9vh;width:240px;height:60px;pointer-events:none;}
+
+  /* ===================================================== */
+  /* 5 · 奢华精致 LUXURY REFINED                          */
+  /* ===================================================== */
+  .s-luxury{
+    --bg:#0e0e0e;--fg:#ece6da;--accent:#c9a24b;
+    --hairline:1px solid rgba(201,162,75,.28);
+    --font-display:"Playfair Display","Noto Serif SC",serif;--font-body:"Space Grotesk",system-ui;--font-mono:"Space Mono",monospace;
+    --pad:3.4vw 4.4vw;--section-gap:5.5vh;
+    --brand-size:2.4vw;--brand-weight:400;--nav-size:.92vw;--nav-gap:3.2vw;--nav-spacing:.18em;
+    --kicker-size:.82vw;--kicker-spacing:.4em;
+    --h1-size:6.8vw;--h1-weight:400;--h1-lh:1.08;--h1-width:70%;
+    --lead-size:1.15vw;--lead-width:42%;--lead-lh:1.8;
+    --btn-bg:transparent;--btn-fg:#c9a24b;--btn-border:1px solid #c9a24b;--btn-pad:1.2vh 2.6vw;--btn-size:.95vw;--btn-spacing:.18em;
+    --body-size:1.02vw;--stat-size:3.4vw;--col-gap:5vw;
+    --work-gap:2vw;--card-pad:1.8vw;--card-h:18vh;--work-title:1.5vw;--work-weight:400;--card-border:1px solid rgba(201,162,75,.25);
+  }
+  .s-luxury .brand{letter-spacing:.3em;}
+  .s-luxury .h1{font-style:italic;}
+  .s-luxury .kicker{letter-spacing:.45em;}
+  .s-luxury .nav-links{text-transform:uppercase;}
+
+  /* ===================================================== */
+  /* 6 · 编辑杂志 EDITORIAL MAGAZINE                      */
+  /* ===================================================== */
+  .s-editorial{
+    --bg:#ffffff;--fg:#16110d;--accent:#16110d;
+    --hairline:1px solid #16110d;
+    --font-display:"Playfair Display","Noto Serif SC",serif;--font-body:"Space Grotesk",system-ui;--font-mono:"Space Mono",monospace;
+    --pad:2.6vw 3vw;--section-gap:3.5vh;
+    --brand-size:2vw;--brand-weight:900;--nav-size:.85vw;--nav-gap:2.4vw;--nav-spacing:.12em;
+    --kicker-size:.78vw;--kicker-spacing:.3em;
+    --h1-size:7.4vw;--h1-weight:900;--h1-lh:.98;--h1-width:88%;
+    --lead-size:1.1vw;--lead-width:64%;--lead-lh:1.7;
+    --btn-bg:#16110d;--btn-fg:#fff;--btn-pad:1.1vh 2vw;--btn-size:.85vw;--btn-spacing:.1em;
+    --body-size:.98vw;--stat-size:2.8vw;--col-gap:3vw;
+    --work-gap:1.4vw;--card-pad:1.4vw;--card-h:17vh;--work-title:1.4vw;--work-weight:900;--card-border:1px solid #16110d;
+  }
+  .s-editorial .mock-body{background-image:linear-gradient(90deg,rgba(22,17,13,.07) 1px,transparent 1px);background-size:calc(100%/12) 100%;}
+  .s-editorial .masthead{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px double #16110d;padding-bottom:1vh;}
+  .s-editorial .masthead .date{font-family:"Space Mono",monospace;font-size:.78vw;letter-spacing:.1em;}
+  .s-editorial .lead::first-letter{font-family:"Playfair Display","Noto Serif SC",serif;font-size:4.4vw;font-weight:900;float:left;line-height:.8;padding:0 .4vw 0 0;}
+
+  /* ===================================================== */
+  /* 7 · 野兽派原始 BRUTALIST                             */
+  /* ===================================================== */
+  .s-brutal{
+    --bg:#ffffff;--fg:#0a0a0a;--accent:#ffe600;
+    --hairline:3px solid #0a0a0a;
+    --font-display:"Archivo Black","Space Grotesk",system-ui;--font-body:"Space Mono",monospace;--font-mono:"Space Mono",monospace;
+    --pad:2.2vw 2.6vw;--section-gap:3vh;
+    --brand-size:2.6vw;--brand-weight:900;--nav-size:.95vw;--nav-gap:2vw;--nav-spacing:.04em;
+    --kicker-size:.85vw;--kicker-spacing:.2em;
+    --h1-size:7vw;--h1-weight:900;--h1-lh:1.0;--h1-width:92%;--h1-spacing:-.01em;
+    --lead-size:1.15vw;--lead-width:58%;--lead-lh:1.6;
+    --btn-bg:#ffe600;--btn-fg:#0a0a0a;--btn-border:3px solid #0a0a0a;--btn-pad:1.2vh 2vw;--btn-size:.95vw;--btn-spacing:.04em;
+    --body-size:.98vw;--stat-size:3vw;--col-gap:2.4vw;
+    --work-gap:1.4vw;--card-pad:1.4vw;--card-h:18vh;--work-title:1.5vw;--work-weight:900;--card-border:3px solid #0a0a0a;
+  }
+  .s-brutal .mock-nav{background:var(--accent);}
+  .s-brutal .h1{text-transform:uppercase;}
+  .s-brutal .kicker{background:#0a0a0a;color:var(--accent);display:inline-block;padding:.4vh .8vw;}
+  .s-brutal .lead{background:#0a0a0a;color:#fff;padding:1.4vh 1.4vw;}
+  .s-brutal .cta{text-transform:uppercase;font-weight:700;}
+  .s-brutal .work-card:nth-child(2){background:var(--accent);}
+  .s-brutal .nav-links{font-weight:700;}
+
+  /* ===================================================== */
+  /* 8 · 装饰艺术几何 ART DECO GEOMETRIC                  */
+  /* ===================================================== */
+  .s-deco{
+    --bg:#0d1b1e;--fg:#f0e9d6;--accent:#d4af37;
+    --hairline:1px solid rgba(212,175,55,.35);
+    --font-display:"Playfair Display","Noto Serif SC",serif;--font-body:"Space Grotesk",system-ui;--font-mono:"Space Mono",monospace;
+    --pad:3.2vw 4vw;--section-gap:4.5vh;
+    --brand-size:2.4vw;--brand-weight:400;--nav-size:.9vw;--nav-gap:3vw;--nav-spacing:.24em;
+    --kicker-size:.82vw;--kicker-spacing:.42em;
+    --h1-size:6.2vw;--h1-weight:700;--h1-lh:1.1;--h1-width:70%;--h1-spacing:.01em;
+    --lead-size:1.12vw;--lead-width:44%;--lead-lh:1.8;
+    --btn-bg:transparent;--btn-fg:#d4af37;--btn-border:1px solid #d4af37;--btn-pad:1.2vh 2.6vw;--btn-size:.92vw;--btn-spacing:.2em;
+    --body-size:1.02vw;--stat-size:3.2vw;--col-gap:4vw;
+    --work-gap:1.8vw;--card-pad:1.7vw;--card-h:18vh;--work-title:1.45vw;--work-weight:400;--card-border:1px solid rgba(212,175,55,.3);
+  }
+  .s-deco .mock{align-items:center;text-align:center;}
+  .s-deco .mock-nav{width:100%;}
+  .s-deco .mock-body{align-items:center;text-align:center;}
+  .s-deco .h1,.s-deco .lead,.s-deco .kicker,.s-deco .cta,.s-deco .row2{max-width:none;}
+  .s-deco .h1{text-transform:uppercase;}
+  .s-deco .kicker{letter-spacing:.5em;}
+  .s-deco .nav-links{text-transform:uppercase;}
+  .s-deco .row2{width:72%;justify-content:center;gap:5vw;}
+  .s-deco .works{width:84%;}
+  .s-deco .mock::before{content:"";position:absolute;inset:0;pointer-events:none;background:
+    repeating-linear-gradient(135deg,rgba(212,175,55,.06) 0 2px,transparent 2px 22px);}
+  .s-deco .fan{position:absolute;top:8vh;left:50%;transform:translateX(-50%);width:120px;height:60px;opacity:.4;pointer-events:none;}
+
+  /* ===================================================== */
+  /* 9 · 柔和粉彩 SOFT PASTEL                             */
+  /* ===================================================== */
+  .s-pastel{
+    --bg:linear-gradient(135deg,#ffe3f1 0%,#e3ecff 50%,#e3fff0 100%);--fg:#5a4a63;--accent:#e98ab5;
+    --hairline:1px solid rgba(255,255,255,.6);
+    --font-display:"Space Grotesk",system-ui;--font-body:"Space Grotesk",system-ui;--font-mono:"Space Mono",monospace;
+    --pad:3vw 3.6vw;--section-gap:4vh;
+    --brand-size:2.2vw;--brand-weight:500;--nav-size:.95vw;--nav-gap:2.8vw;
+    --kicker-size:.88vw;--kicker-spacing:.18em;
+    --h1-size:5.8vw;--h1-weight:500;--h1-lh:1.12;--h1-width:66%;
+    --lead-size:1.18vw;--lead-width:46%;--lead-lh:1.75;
+    --btn-bg:#e98ab5;--btn-fg:#fff;--btn-pad:1.3vh 2.4vw;--btn-radius:30px;--btn-size:1vw;--btn-spacing:.02em;
+    --body-size:1.05vw;--stat-size:3vw;--col-gap:3.5vw;
+    --work-gap:1.8vw;--card-pad:1.7vw;--card-h:18vh;--work-title:1.45vw;--card-radius:24px;--card-bg:rgba(255,255,255,.65);--card-shadow:0 10px 30px rgba(180,150,200,.18);
+  }
+  .s-pastel .mock{background:var(--bg);}
+  .s-pastel .kicker{color:#9a7bc8;}
+  .s-pastel .work-card:nth-child(2){background:rgba(180,210,255,.6);}
+  .s-pastel .work-card:nth-child(3){background:rgba(180,240,205,.6);}
+  .s-pastel .bubble{position:absolute;border-radius:50%;filter:blur(2px);pointer-events:none;}
+  .s-pastel .b1{width:220px;height:220px;background:rgba(255,180,210,.5);top:-40px;right:8vw;}
+  .s-pastel .b2{width:160px;height:160px;background:rgba(180,200,255,.45);bottom:6vh;left:4vw;}
+
+  /* ===================================================== */
+  /* 10 · 工业实用 INDUSTRIAL UTILITY                     */
+  /* ===================================================== */
+  .s-industrial{
+    --bg:#121212;--fg:#d8d8d8;--accent:#ffb000;
+    --hairline:1px solid #2a2a2a;
+    --font-display:"Space Mono",monospace;--font-body:"Space Mono",monospace;--font-mono:"Space Mono",monospace;
+    --pad:2.4vw 2.8vw;--section-gap:2.6vh;
+    --brand-size:1.8vw;--brand-weight:700;--nav-size:.82vw;--nav-gap:2vw;
+    --kicker-size:.78vw;--kicker-spacing:.16em;
+    --h1-size:4.4vw;--h1-weight:700;--h1-lh:1.1;--h1-width:90%;
+    --lead-size:.95vw;--lead-width:60%;--lead-lh:1.6;
+    --btn-bg:#ffb000;--btn-fg:#121212;--btn-pad:1vh 1.6vw;--btn-size:.85vw;--btn-spacing:.04em;
+    --body-size:.88vw;--stat-size:2.4vw;--col-gap:3vw;
+    --work-gap:1.4vw;--card-pad:1.2vw;--card-h:15vh;--work-title:1.1vw;--work-weight:700;--card-border:1px solid #2a2a2a;
+  }
+  .s-industrial .mock-nav{background:#0a0a0a;}
+  .s-industrial .brand{color:var(--accent);}
+  .s-industrial .kicker{color:var(--accent);}
+  .s-industrial .h1{text-transform:uppercase;letter-spacing:0;}
+  .s-industrial .work-card{background:#0a0a0a;}
+  .s-industrial .work-card .wk{color:var(--accent);}
+  .s-industrial .sysrow{display:flex;gap:1.4vw;flex-wrap:wrap;font-family:"Space Mono",monospace;font-size:.74vw;color:#8a8a8a;border:1px solid #2a2a2a;padding:1vh 1.2vw;}
+  .s-industrial .sysrow b{color:var(--accent);font-weight:400;}
+  .s-industrial .mock-foot{background:#0a0a0a;}
+</style>
+</head>
+<body>
+
+<div class="hud">
+  <div class="left">
+    <span class="idx" id="hudIdx">00 / 11</span>
+    <span class="nm" id="hudNm">封面</span>
+    <span class="kw" id="hudKw">10 种美学 · 横向对照</span>
+  </div>
+  <div class="right">
+    <span class="hint">← → 翻页 · ESC 索引</span>
+    <button class="ibtn" id="ibtn">索引 ⌗</button>
+  </div>
+</div>
+
+<div class="track" id="track">
+
+  <!-- 0 COVER -->
+  <section class="slide s-cover active" data-name="目录封面" data-kw="10 种美学 · 横向对照">
+    <div class="mock">
+      <div class="ct">FRONTEND DESIGN · AESTHETIC SPECTRUM</div>
+      <div class="ch">10 种美学风格<br/>网站设计语言图谱</div>
+      <div class="cl">同一家虚构创意工作室「NOVA」，用十套极端的设计基调各做一版网站首页。横向翻页，对比同一种内容在不同视觉语言下的气质差异。</div>
+      <div class="cgrid">
+        <span class="chip">01 极简主义</span><span class="chip">02 繁复混乱</span><span class="chip">03 复古未来</span>
+        <span class="chip">04 有机自然</span><span class="chip">05 奢华精致</span><span class="chip">06 编辑杂志</span>
+        <span class="chip">07 野兽派原始</span><span class="chip">08 装饰艺术几何</span><span class="chip">09 柔和粉彩</span><span class="chip">10 工业实用</span>
+      </div>
+      <div class="cnav">→ 按右方向键开始 · 或按 ESC 打开索引</div>
+    </div>
+  </section>
+
+  <!-- 1 MINIMALISM -->
+  <section class="slide s-minimal" data-name="极简主义" data-kw="稀疏 · 单色 · 巨大排版 · 原始边缘">
+    <div class="mock">
+      <nav class="mock-nav"><span class="brand">NOVA</span><span class="nav-links"><span>作品</span><span>关于</span><span>服务</span><span>联系</span></span></nav>
+      <div class="mock-body">
+        <div class="kicker">独立创意工作室 · EST. 2018</div>
+        <h1 class="h1">为品牌造一座会呼吸的视觉系统</h1>
+        <p class="lead">我们做品牌识别、网页与动态设计，相信克制与张力可以共存。</p>
+        <a class="cta">查看作品 →</a>
+        <div class="row2">
+          <p class="about-p">少，但是更好。我们把每一个元素都当作一次取舍——只留下真正承担信息的部分，让留白成为版式的主角。</p>
+          <div class="stats"><div class="stat"><div class="num">120+</div><div class="lab">交付项目</div></div><div class="stat"><div class="num">18</div><div class="lab">设计奖项</div></div></div>
+        </div>
+        <div class="works">
+          <div class="work-card"><div><div class="wt">品牌重塑</div><div class="wd">为茶饮品牌建立极简识别系统。</div></div><div class="wk">CASE 01</div></div>
+          <div class="work-card"><div><div class="wt">网页重构</div><div class="wd">金融平台的信息层级梳理。</div></div><div class="wk">CASE 02</div></div>
+          <div class="work-card"><div><div class="wt">动态视觉</div><div class="wd">发布会主视觉与片头动画。</div></div><div class="wk">CASE 03</div></div>
+        </div>
+      </div>
+      <footer class="mock-foot"><span>© 2026 NOVA STUDIO</span><span>HELLO@NOVA.STUDIO · 上海</span></footer>
+    </div>
+  </section>
+
+  <!-- 2 CHAOS -->
+  <section class="slide s-chaos" data-name="繁复混乱" data-kw="分层 · 密集 · 重叠元素 · 受控的混乱">
+    <div class="mock">
+      <nav class="mock-nav"><span class="brand">NOVA°</span><span class="nav-links"><span>作品／</span><span>关于／</span><span>服务／</span><span>联系／</span></span></nav>
+      <div class="mock-body">
+        <div class="kicker">独立创意工作室 · EST. 2018 ★</div>
+        <h1 class="h1">为品牌造一座会呼吸的视觉系统！</h1>
+        <p class="lead">我们做品牌识别、网页与动态设计，相信克制与张力可以共存——在喧闹里保持秩序。</p>
+        <a class="cta">查看作品 →</a>
+        <div class="row2">
+          <p class="about-p">密度即态度。我们把标签、色块、手写注记层层叠放，让页面像一张被反复修改的草稿，热闹却有重心。</p>
+          <div class="stats"><div class="stat"><div class="num">120+</div><div class="lab">PROJECTS</div></div><div class="stat"><div class="num">18</div><div class="lab">AWARDS</div></div></div>
+        </div>
+        <div class="works">
+          <div class="work-card"><div><div class="wt">品牌重塑</div><div class="wd">茶饮品牌 · 高饱和识别。</div></div><div class="wk">CASE 01</div></div>
+          <div class="work-card"><div><div class="wt">网页重构</div><div class="wd">金融平台 · 信息密度。</div></div><div class="wk">CASE 02</div></div>
+          <div class="work-card"><div><div class="wt">动态视觉</div><div class="wd">发布会 · 片头动画。</div></div><div class="wk">CASE 03</div></div>
+        </div>
+      </div>
+      <footer class="mock-foot"><span>© 2026 NOVA STUDIO</span><span>HELLO@NOVA.STUDIO · 上海</span></footer>
+    </div>
+  </section>
+
+  <!-- 3 RETRO-FUTURISM -->
+  <section class="slide s-retro" data-name="复古未来" data-kw="霓虹点缀 · 几何形状 · CRT 美学">
+    <div class="mock">
+      <div class="deco-grid"></div><div class="shape s1"></div><div class="shape s2"></div>
+      <nav class="mock-nav"><span class="brand">NOVA</span><span class="nav-links"><span>作品</span><span>关于</span><span>服务</span><span>联系</span></span></nav>
+      <div class="mock-body">
+        <div class="kicker">独立创意工作室 · EST. 2018</div>
+        <h1 class="h1">为品牌造一座会呼吸的视觉系统</h1>
+        <p class="lead">我们做品牌识别、网页与动态设计，相信克制与张力可以共存于未来的霓虹里。</p>
+        <a class="cta">查看作品 →</a>
+        <div class="row2">
+          <p class="about-p">像一台来自 1985 年的终端，却运行着明天的想象力。扫描线、辉光与几何，是我们对「未来怀旧」的诠释。</p>
+          <div class="stats"><div class="stat"><div class="num">120+</div><div class="lab">交付项目</div></div><div class="stat"><div class="num">18</div><div class="lab">设计奖项</div></div></div>
+        </div>
+        <div class="works">
+          <div class="work-card"><div><div class="wt">品牌重塑</div><div class="wd">茶饮品牌 · 霓虹识别。</div></div><div class="wk">CASE 01</div></div>
+          <div class="work-card"><div><div class="wt">网页重构</div><div class="wd">金融平台 · 网格界面。</div></div><div class="wk">CASE 02</div></div>
+          <div class="work-card"><div><div class="wt">动态视觉</div><div class="wd">发布会 · 辉光动画。</div></div><div class="wk">CASE 03</div></div>
+        </div>
+      </div>
+      <footer class="mock-foot"><span>© 2026 NOVA STUDIO</span><span>HELLO@NOVA.STUDIO · 上海</span></footer>
+    </div>
+  </section>
+
+  <!-- 4 ORGANIC -->
+  <section class="slide s-organic" data-name="有机自然" data-kw="柔和曲线 · 大地色 · 手绘元素">
+    <div class="mock">
+      <svg class="squiggle" viewBox="0 0 240 60" fill="none"><path d="M4 40 C 40 10, 80 60, 120 30 S 200 5, 236 38" stroke="#c1684a" stroke-width="4" stroke-linecap="round"/></svg>
+      <nav class="mock-nav"><span class="brand">NOVA</span><span class="nav-links"><span>作品</span><span>关于</span><span>服务</span><span>联系</span></span></nav>
+      <div class="mock-body">
+        <div class="kicker">独立创意工作室 · EST. 2018</div>
+        <h1 class="h1">为品牌造一座会呼吸的视觉系统</h1>
+        <p class="lead">我们做品牌识别、网页与动态设计，相信克制与张力可以像植物一样自然生长。</p>
+        <a class="cta">查看作品 →</a>
+        <div class="row2">
+          <p class="about-p">用泥土、草木与陶土的颜色，配柔软的圆角与手绘笔触，让屏幕也有温度。曲线代替直线，呼吸代替紧绷。</p>
+          <div class="stats"><div class="stat"><div class="num">120+</div><div class="lab">交付项目</div></div><div class="stat"><div class="num">18</div><div class="lab">设计奖项</div></div></div>
+        </div>
+        <div class="works">
+          <div class="work-card"><div><div class="wt">品牌重塑</div><div class="wd">茶饮品牌 · 手作质感。</div></div><div class="wk">CASE 01</div></div>
+          <div class="work-card"><div><div class="wt">网页重构</div><div class="wd">自然平台 · 柔和层级。</div></div><div class="wk">CASE 02</div></div>
+          <div class="work-card"><div><div class="wt">动态视觉</div><div class="wd">发布会 · 生长动画。</div></div><div class="wk">CASE 03</div></div>
+        </div>
+      </div>
+      <footer class="mock-foot"><span>© 2026 NOVA STUDIO</span><span>HELLO@NOVA.STUDIO · 上海</span></footer>
+    </div>
+  </section>
+
+  <!-- 5 LUXURY -->
+  <section class="slide s-luxury" data-name="奢华精致" data-kw="微妙动画 · 高级排版 · 克制调色板">
+    <div class="mock">
+      <nav class="mock-nav"><span class="brand">NOVA</span><span class="nav-links"><span>作品</span><span>关于</span><span>服务</span><span>联系</span></span></nav>
+      <div class="mock-body">
+        <div class="kicker">独立创意工作室 · EST. 2018</div>
+        <h1 class="h1">为品牌造一座会呼吸的视觉系统</h1>
+        <p class="lead">我们做品牌识别、网页与动态设计，相信克制与张力可以共存于静默的优雅之中。</p>
+        <a class="cta">查看作品 →</a>
+        <div class="row2">
+          <p class="about-p">黑、奶白与一道金线，就是全部语言。衬线斜体与宽字距，让每一个字都像被精心摆放过。少即是贵。</p>
+          <div class="stats"><div class="stat"><div class="num">120+</div><div class="lab">交付项目</div></div><div class="stat"><div class="num">18</div><div class="lab">设计奖项</div></div></div>
+        </div>
+        <div class="works">
+          <div class="work-card"><div><div class="wt">品牌重塑</div><div class="wd">高定品牌 · 金线识别。</div></div><div class="wk">CASE 01</div></div>
+          <div class="work-card"><div><div class="wt">网页重构</div><div class="wd">奢品平台 · 静默层级。</div></div><div class="wk">CASE 02</div></div>
+          <div class="work-card"><div><div class="wt">动态视觉</div><div class="wd">大秀 · 微妙动效。</div></div><div class="wk">CASE 03</div></div>
+        </div>
+      </div>
+      <footer class="mock-foot"><span>© 2026 NOVA STUDIO</span><span>HELLO@NOVA.STUDIO · 上海</span></footer>
+    </div>
+  </section>
+
+  <!-- 6 EDITORIAL -->
+  <section class="slide s-editorial" data-name="编辑杂志" data-kw="强网格 · 戏剧性标题 · 留白即特色">
+    <div class="mock">
+      <nav class="mock-nav"><span class="brand">NOVA</span><span class="nav-links"><span>作品</span><span>关于</span><span>服务</span><span>联系</span></span></nav>
+      <div class="mock-body">
+        <div class="masthead"><span class="brand" style="font-size:1.4vw;">NOVA 季刊</span><span class="date">VOL.12 — 2026 春</span></div>
+        <div class="kicker">独立创意工作室 · EST. 2018</div>
+        <h1 class="h1">为品牌造一座会呼吸的视觉系统</h1>
+        <p class="lead">我们做品牌识别、网页与动态设计，相信克制与张力可以共存。本期走访十种美学语言，看同一种内容如何被重新讲述。</p>
+        <div class="row2">
+          <p class="about-p">像编排一本杂志：十二栏网格托住所有内容，戏剧性的衬线大标题制造停顿，留白本身成为一种版式语言。</p>
+          <div class="stats"><div class="stat"><div class="num">120+</div><div class="lab">交付项目</div></div><div class="stat"><div class="num">18</div><div class="lab">设计奖项</div></div></div>
+        </div>
+        <div class="works">
+          <div class="work-card"><div><div class="wt">品牌重塑</div><div class="wd">茶饮品牌 · 刊例式识别。</div></div><div class="wk">CASE 01</div></div>
+          <div class="work-card"><div><div class="wt">网页重构</div><div class="wd">媒体平台 · 栏目层级。</div></div><div class="wk">CASE 02</div></div>
+          <div class="work-card"><div><div class="wt">动态视觉</div><div class="wd">发布会 · 分镜叙事。</div></div><div class="wk">CASE 03</div></div>
+        </div>
+      </div>
+      <footer class="mock-foot"><span>© 2026 NOVA STUDIO</span><span>HELLO@NOVA.STUDIO · 上海</span></footer>
+    </div>
+  </section>
+
+  <!-- 7 BRUTALIST -->
+  <section class="slide s-brutal" data-name="野兽派原始" data-kw="暴露结构 · 强烈对比 · 反设计">
+    <div class="mock">
+      <nav class="mock-nav"><span class="brand">NOVA</span><span class="nav-links"><span>作品</span><span>关于</span><span>服务</span><span>联系</span></span></nav>
+      <div class="mock-body">
+        <div class="kicker">独立创意工作室 · EST. 2018</div>
+        <h1 class="h1">为品牌造一座会呼吸的视觉系统</h1>
+        <p class="lead">我们做品牌识别、网页与动态设计。没有圆角，没有阴影，没有讨好——结构本身就是态度。</p>
+        <a class="cta">查看作品 →</a>
+        <div class="row2">
+          <p class="about-p">把 HTML 的骨头露出来。粗黑边框、等宽字体、刺眼的黄，故意不做美化。反设计，也是一种设计立场。</p>
+          <div class="stats"><div class="stat"><div class="num">120+</div><div class="lab">PROJECTS</div></div><div class="stat"><div class="num">18</div><div class="lab">AWARDS</div></div></div>
+        </div>
+        <div class="works">
+          <div class="work-card"><div><div class="wt">品牌重塑</div><div class="wd">茶饮品牌 ·  raw 识别。</div></div><div class="wk">CASE 01</div></div>
+          <div class="work-card"><div><div class="wt">网页重构</div><div class="wd">平台 · 功能优先。</div></div><div class="wk">CASE 02</div></div>
+          <div class="work-card"><div><div class="wt">动态视觉</div><div class="wd">发布会 · 硬切动画。</div></div><div class="wk">CASE 03</div></div>
+        </div>
+      </div>
+      <footer class="mock-foot"><span>© 2026 NOVA STUDIO</span><span>HELLO@NOVA.STUDIO · 上海</span></footer>
+    </div>
+  </section>
+
+  <!-- 8 ART DECO -->
+  <section class="slide s-deco" data-name="装饰艺术几何" data-kw="金色点缀 · 对称 · 华丽图案">
+    <div class="mock">
+      <svg class="fan" viewBox="0 0 120 60" fill="none"><path d="M60 60 L10 10 M60 60 L30 8 M60 60 L60 4 M60 60 L90 8 M60 60 L110 10" stroke="#d4af37" stroke-width="1.5"/><path d="M60 60 A50 50 0 0 1 10 10" stroke="#d4af37" stroke-width="1" opacity=".6"/></svg>
+      <nav class="mock-nav"><span class="brand">NOVA</span><span class="nav-links"><span>作品</span><span>关于</span><span>服务</span><span>联系</span></span></nav>
+      <div class="mock-body">
+        <div class="kicker">独立创意工作室 · EST. 2018</div>
+        <h1 class="h1">为品牌造一座会呼吸的视觉系统</h1>
+        <p class="lead">我们做品牌识别、网页与动态设计，相信克制与张力可以共存于对称的华丽之中。</p>
+        <a class="cta">查看作品 →</a>
+        <div class="row2">
+          <p class="about-p">以中轴为尊，金线勾勒扇形与阶梯。每一种装饰都有秩序，华丽而不喧哗，像一幢装饰艺术大厦的立面。</p>
+          <div class="stats"><div class="stat"><div class="num">120+</div><div class="lab">交付项目</div></div><div class="stat"><div class="num">18</div><div class="lab">设计奖项</div></div></div>
+        </div>
+        <div class="works">
+          <div class="work-card"><div><div class="wt">品牌重塑</div><div class="wd">酒饮品牌 · 金线识别。</div></div><div class="wk">CASE 01</div></div>
+          <div class="work-card"><div><div class="wt">网页重构</div><div class="wd">地产平台 · 对称层级。</div></div><div class="wk">CASE 02</div></div>
+          <div class="work-card"><div><div class="wt">动态视觉</div><div class="wd">晚宴 · 几何动画。</div></div><div class="wk">CASE 03</div></div>
+        </div>
+      </div>
+      <footer class="mock-foot"><span>© 2026 NOVA STUDIO</span><span>HELLO@NOVA.STUDIO · 上海</span></footer>
+    </div>
+  </section>
+
+  <!-- 9 PASTEL -->
+  <section class="slide s-pastel" data-name="柔和粉彩" data-kw="圆角 · 温柔渐变 · 友好亲和">
+    <div class="mock">
+      <div class="bubble b1"></div><div class="bubble b2"></div>
+      <nav class="mock-nav"><span class="brand">NOVA</span><span class="nav-links"><span>作品</span><span>关于</span><span>服务</span><span>联系</span></span></nav>
+      <div class="mock-body">
+        <div class="kicker">独立创意工作室 · EST. 2018</div>
+        <h1 class="h1">为品牌造一座会呼吸的视觉系统</h1>
+        <p class="lead">我们做品牌识别、网页与动态设计，相信克制与张力可以共存在温柔的糖果色里。</p>
+        <a class="cta">查看作品 →</a>
+        <div class="row2">
+          <p class="about-p">粉、蓝、薄荷的柔光渐变，配上圆滚滚的边角与软阴影，让品牌像一杯刚做好的气泡饮，亲切又轻盈。</p>
+          <div class="stats"><div class="stat"><div class="num">120+</div><div class="lab">交付项目</div></div><div class="stat"><div class="num">18</div><div class="lab">设计奖项</div></div></div>
+        </div>
+        <div class="works">
+          <div class="work-card"><div><div class="wt">品牌重塑</div><div class="wd">甜品品牌 · 粉彩识别。</div></div><div class="wk">CASE 01</div></div>
+          <div class="work-card"><div><div class="wt">网页重构</div><div class="wd">母婴平台 · 友好层级。</div></div><div class="wk">CASE 02</div></div>
+          <div class="work-card"><div><div class="wt">动态视觉</div><div class="wd">市集 · 弹跳动画。</div></div><div class="wk">CASE 03</div></div>
+        </div>
+      </div>
+      <footer class="mock-foot"><span>© 2026 NOVA STUDIO</span><span>HELLO@NOVA.STUDIO · 上海</span></footer>
+    </div>
+  </section>
+
+  <!-- 10 INDUSTRIAL -->
+  <section class="slide s-industrial" data-name="工业实用" data-kw="功能性 · 等宽字体 · 数据密集">
+    <div class="mock">
+      <nav class="mock-nav"><span class="brand">NOVA // SYS</span><span class="nav-links"><span>[作品]</span><span>[关于]</span><span>[服务]</span><span>[联系]</span></span></nav>
+      <div class="mock-body">
+        <div class="kicker">独立创意工作室 · EST. 2018</div>
+        <h1 class="h1">为品牌造一座会呼吸的视觉系统</h1>
+        <p class="lead">我们做品牌识别、网页与动态设计。所有装饰皆为噪音，只保留功能与数据。</p>
+        <div class="sysrow"><span>STATUS: <b>ONLINE</b></span><span>UPTIME: <b>99.98%</b></span><span>STACK: <b>HTML/CSS/JS</b></span><span>REGION: <b>SHANGHAI</b></span></div>
+        <a class="cta">查看作品 →</a>
+        <div class="row2">
+          <p class="about-p">等宽字体、灰色网格、状态标签——把网页当作控制台来排。信息密度优先，美观退居其次，但秩序本身就是美。</p>
+          <div class="stats"><div class="stat"><div class="num">120+</div><div class="lab">DELIVERED</div></div><div class="stat"><div class="num">18</div><div class="lab">AWARDS</div></div></div>
+        </div>
+        <div class="works">
+          <div class="work-card"><div><div class="wt">品牌重塑</div><div class="wd">工具品牌 · 标识系统。</div></div><div class="wk">CASE 01</div></div>
+          <div class="work-card"><div><div class="wt">网页重构</div><div class="wd">数据平台 · 表格层级。</div></div><div class="wk">CASE 02</div></div>
+          <div class="work-card"><div><div class="wt">动态视觉</div><div class="wd">看板 · 实时动画。</div></div><div class="wk">CASE 03</div></div>
+        </div>
+      </div>
+      <footer class="mock-foot"><span>© 2026 NOVA STUDIO</span><span>HELLO@NOVA.STUDIO · 上海</span></footer>
+    </div>
+  </section>
+
+</div>
+
+<div class="index" id="index">
+  <div class="cell" data-go="0"><div class="n">00</div><div class="t">目录封面</div><div class="k">10 种美学 · 横向对照</div></div>
+  <div class="cell" data-go="1"><div class="n">01</div><div class="t">极简主义</div><div class="k">稀疏 · 单色 · 巨大排版 · 原始边缘</div></div>
+  <div class="cell" data-go="2"><div class="n">02</div><div class="t">繁复混乱</div><div class="k">分层 · 密集 · 重叠元素 · 受控的混乱</div></div>
+  <div class="cell" data-go="3"><div class="n">03</div><div class="t">复古未来</div><div class="k">霓虹点缀 · 几何形状 · CRT 美学</div></div>
+  <div class="cell" data-go="4"><div class="n">04</div><div class="t">有机自然</div><div class="k">柔和曲线 · 大地色 · 手绘元素</div></div>
+  <div class="cell" data-go="5"><div class="n">05</div><div class="t">奢华精致</div><div class="k">微妙动画 · 高级排版 · 克制调色板</div></div>
+  <div class="cell" data-go="6"><div class="n">06</div><div class="t">编辑杂志</div><div class="k">强网格 · 戏剧性标题 · 留白即特色</div></div>
+  <div class="cell" data-go="7"><div class="n">07</div><div class="t">野兽派原始</div><div class="k">暴露结构 · 强烈对比 · 反设计</div></div>
+  <div class="cell" data-go="8"><div class="n">08</div><div class="t">装饰艺术几何</div><div class="k">金色点缀 · 对称 · 华丽图案</div></div>
+  <div class="cell" data-go="9"><div class="n">09</div><div class="t">柔和粉彩</div><div class="k">圆角 · 温柔渐变 · 友好亲和</div></div>
+  <div class="cell" data-go="10"><div class="n">10</div><div class="t">工业实用</div><div class="k">功能性 · 等宽字体 · 数据密集</div></div>
+</div>
+
+<script>
+  const track = document.getElementById('track');
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const total = slides.length;
+  const hudIdx = document.getElementById('hudIdx');
+  const hudNm = document.getElementById('hudNm');
+  const hudKw = document.getElementById('hudKw');
+  const indexEl = document.getElementById('index');
+  let cur = 0;
+
+  function updateHud(){
+    const s = slides[cur];
+    hudIdx.textContent = String(cur+1).padStart(2,'0') + ' / ' + String(total).padStart(2,'0');
+    hudNm.textContent = s.dataset.name;
+    hudKw.textContent = s.dataset.kw;
+  }
+  function go(i){
+    cur = Math.max(0, Math.min(total-1, i));
+    track.style.transform = 'translateX(-' + (cur*100) + 'vw)';
+    slides.forEach((s,k)=> s.classList.toggle('active', k===cur));
+    updateHud();
+  }
+  function toggleIndex(force){
+    const open = force!==undefined ? force : !indexEl.classList.contains('open');
+    indexEl.classList.toggle('open', open);
+  }
+
+  document.addEventListener('keydown', (e)=>{
+    if(e.key==='ArrowRight'){ go(cur+1); toggleIndex(false); }
+    else if(e.key==='ArrowLeft'){ go(cur-1); toggleIndex(false); }
+    else if(e.key==='Escape'){ toggleIndex(); }
+  });
+
+  // wheel (horizontal)
+  let wheelLock = false;
+  window.addEventListener('wheel', (e)=>{
+    if(indexEl.classList.contains('open')) return;
+    const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+    if(wheelLock || Math.abs(d) < 12) return;
+    wheelLock = true;
+    go(cur + (d>0 ? 1 : -1));
+    setTimeout(()=> wheelLock=false, 650);
+  }, {passive:true});
+
+  // touch swipe
+  let tx=0, ty=0;
+  window.addEventListener('touchstart',(e)=>{ tx=e.touches[0].clientX; ty=e.touches[0].clientY; },{passive:true});
+  window.addEventListener('touchend',(e)=>{
+    if(indexEl.classList.contains('open')) return;
+    const dx=e.changedTouches[0].clientX - tx;
+    const dy=e.changedTouches[0].clientY - ty;
+    if(Math.abs(dx)>50 && Math.abs(dx)>Math.abs(dy)){ go(cur + (dx<0?1:-1)); }
+  },{passive:true});
+
+  document.getElementById('ibtn').addEventListener('click', ()=> toggleIndex());
+  indexEl.querySelectorAll('.cell').forEach(c=> c.addEventListener('click', ()=>{ go(parseInt(c.dataset.go,10)); toggleIndex(false); }));
+
+  updateHud();
+</script>
+</body>
+</html>
